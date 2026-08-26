@@ -1,100 +1,47 @@
-# vinext-starter
+# 增肌营养助手
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+本地优先的手机营养追踪 PWA。核心动作：看缺口、记饮食、配下一顿。
 
-## Prerequisites
+## 功能
 
-- Node.js `>=22.13.0`
+- 首次填写身体数据，以 Mifflin-St Jeor 公式计算增肌热量和三大营养素目标
+- 本地规则解析中文饮食输入，例如“3个鸡蛋，250ml牛奶，两片全麦面包，一根香蕉”
+- 食物搜索、自定义食物、份量确认、饮食记录编辑/删除/复制
+- 根据当日剩余缺口排序推荐本地食谱，并可一键加入当天饮食
+- 7 天摄入趋势、体重记录、目标手动修改
+- IndexedDB 本地保存（同时提供 localStorage 备份）、JSON 导入导出及清除数据
+- PWA manifest、Service Worker、iPhone Safe Area 与离线核心功能
 
-## Quick Start
+## 本地运行
+
+需要 Node.js 22+。
 
 ```bash
-npm install
-npm run dev
-npm run build
+pnpm install
+pnpm dev
 ```
 
-This starter does not use `wrangler.jsonc`.
+浏览器打开终端显示的本地地址。构建生产版本：
 
-## Included Shape
-
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
-
-The user ID is stable for the same user on the same Site and different across Sites. Email and name are intended for display or contact purposes.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```bash
+pnpm build
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+## 安装为 PWA
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+- iPhone：使用 Safari 打开应用，点分享按钮，选择“添加到主屏幕”。
+- Android：使用 Chrome 打开应用，在菜单中选择“安装应用”。
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+## 目录说明
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+- `app/components/App.tsx`：主要页面和可操作界面
+- `app/data/foods.ts`：本地食物数据库与别名
+- `app/data/recipes.ts`：本地食谱与缺口匹配评分
+- `app/lib/nutrition.ts`：BMR、TDEE、目标与营养计算
+- `app/lib/foodParser.ts`：可替换的本地自然语言解析器
+- `app/lib/storage.ts`：IndexedDB 与本地备份存储
+- `public/manifest.webmanifest`、`public/sw.js`：PWA 和离线缓存
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+## 扩展
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+新增食物请修改 `app/data/foods.ts` 中的 `seeds`；更大规模食物库可拆分到单独数据文件。新增食谱请修改 `app/data/recipes.ts`。如需接入 AI，将 `app/lib/foodParser.ts` 中的 `parseFoodInput` 替换为符合 `ParsedFood` 返回结构的实现即可；当前版本不调用任何 AI API。
