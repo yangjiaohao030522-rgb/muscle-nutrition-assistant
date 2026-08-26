@@ -27,6 +27,16 @@ pnpm dev
 pnpm build
 ```
 
+## 发布到 GitHub Pages
+
+项目已附带自动发布配置。将此文件夹用 GitHub Desktop 上传到 `main` 分支后：
+
+1. 打开仓库的 **Settings → Pages**，在 **Build and deployment** 中选择 **GitHub Actions**。
+2. 等待仓库顶部的 **Actions** 显示绿色勾号。
+3. 应用将发布到 `https://yangjiaohao030522-rgb.github.io/muscle-nutrition-assistant/`。
+
+后续每次在 GitHub Desktop 推送更新，网页会自动重新发布。
+
 ## 安装为 PWA
 
 - iPhone：使用 Safari 打开应用，点分享按钮，选择“添加到主屏幕”。

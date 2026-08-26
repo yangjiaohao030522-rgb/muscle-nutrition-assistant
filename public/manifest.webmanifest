@@ -1,1 +1,1 @@
-{"name":"增肌营养助手","short_name":"增肌助手","description":"每天看缺口、记饮食、配下一顿。","start_url":"/","display":"standalone","background_color":"#0B0D0E","theme_color":"#0B0D0E","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
+{"name":"增肌营养助手","short_name":"增肌助手","description":"每天看缺口、记饮食、配下一顿。","start_url":"./","display":"standalone","background_color":"#0B0D0E","theme_color":"#0B0D0E","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}

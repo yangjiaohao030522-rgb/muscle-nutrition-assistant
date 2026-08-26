@@ -3,7 +3,11 @@ import type { Activity, BulkSpeed, Nutrition, NutritionGoal, UserProfile } from 
 const activityFactor: Record<Activity, number> = { sedentary: 1.2, light: 1.375, moderate: 1.55, high: 1.725 };
 const bulkSurplus: Record<BulkSpeed, number> = { conservative: .05, standard: .1, aggressive: .15 };
 export const blankNutrition = (): Nutrition => ({ calories: 0, protein: 0, carbs: 0, fat: 0 });
-export const round = (n: number, digits = 0) => Number(n.toFixed(digits));
+/** Supports decimal precision and negative precision (for example, -1 rounds 2478 to 2480). */
+export const round = (n: number, digits = 0) =>
+  digits >= 0
+    ? Number(n.toFixed(digits))
+    : Math.round(n / 10 ** -digits) * 10 ** -digits;
 export const addNutrition = (...items: Nutrition[]): Nutrition => items.reduce((sum, item) => ({ calories: sum.calories + item.calories, protein: sum.protein + item.protein, carbs: sum.carbs + item.carbs, fat: sum.fat + item.fat }), blankNutrition());
 export const foodNutrition = (food: { caloriesPer100g: number; proteinPer100g: number; carbsPer100g: number; fatPer100g: number }, weight: number): Nutrition => ({ calories: round(food.caloriesPer100g * weight / 100), protein: round(food.proteinPer100g * weight / 100, 1), carbs: round(food.carbsPer100g * weight / 100, 1), fat: round(food.fatPer100g * weight / 100, 1) });
 

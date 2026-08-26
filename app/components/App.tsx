@@ -14,7 +14,7 @@ const defaultProfile: UserProfile = {sex:"male",age:26,height:178,weight:70,goal
 
 export default function App() {
  const [data,setData] = useState<AppData>(initialData); const [ready,setReady] = useState(false); const [view,setView] = useState<View>("today"); const [selectedDate,setSelectedDate] = useState(dateKey()); const [toast,setToast] = useState(""); const [parsed,setParsed] = useState<ParsedFood[]>([]); const [unknown,setUnknown] = useState<string[]>([]); const [selectedMeal,setSelectedMeal] = useState<Meal|null>(null); const [selectedRecipe,setSelectedRecipe] = useState<Recipe|null>(null);
- useEffect(()=>{ loadData().then(d=>{setData(d);setReady(true);}); if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(()=>undefined); },[]);
+ useEffect(()=>{ loadData().then(d=>{setData(d);setReady(true);}); if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>undefined); },[]);
  useEffect(()=>{ if(ready) saveData(data); },[data,ready]); useEffect(()=>{ if(!toast) return; const t=setTimeout(()=>setToast(""),2200); return()=>clearTimeout(t); },[toast]);
  const goal = data.goal || (data.profile ? calculateGoal(data.profile) : undefined); const day = data.records[selectedDate] || {date:selectedDate,meals:[]}; const eaten=useMemo(()=>addNutrition(...day.meals.map(m=>m.nutrition)),[day]); const gap=goal?remaining(goal,eaten):blankNutrition(); const excess=goal?overage(goal,eaten):blankNutrition();
  const update=(fn:(d:AppData)=>AppData)=>setData(d=>fn(d)); const go=(next:View)=>{setView(next);window.scrollTo({top:0,behavior:"smooth"});};
